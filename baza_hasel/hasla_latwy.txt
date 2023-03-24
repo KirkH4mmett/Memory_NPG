@@ -65,4 +65,8 @@ tylko
 wafel
 wyraz
 zegar
+<<<<<<< HEAD
 zrobi
+=======
+zrobi
+>>>>>>> dc24bb2a708025434cd70986a486ca2e3068289e
