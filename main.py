@@ -1,6 +1,8 @@
 import pygame
 import sys
+import time
 from button import Button
+from mode import Mode
 
 pygame.init()
 
@@ -43,28 +45,52 @@ goback = Button(screen_width-30, 10, 20, 20, "<-", 20, screen, clicked)
 
 gamemode_buttons = [goback, mode1, mode2, mode3]
 
+# Wczytanie słów z pliku
+easy_words = ["mama", "tata", "dziadek", "babcia", "syn", "córka", "brat", "siostra"]
+medium_words = []
+hard_words = []
+
+new_game = True
+active = False
+user_text = ""
+mode_ = Mode(goback, mode, easy_words, medium_words, hard_words, screen, font)
 
 # Główna pętla gry
 while True:
     # Zmazanie ekranu
     screen.fill(bg)
+    if active:
+        text_surface = font.render(user_text, True, (255, 255, 255))
+        screen.blit(text_surface, (300, 500))
 
     # Sprawdzanie wydarzeń
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
-                pygame.quit()
-                sys.exit(0)
+        if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+            pygame.quit()
+            sys.exit(0)
+
+        # Wpisywanie
+        if event.type == pygame.KEYDOWN:
+            if active:
+                if event.key == pygame.K_BACKSPACE:
+                    user_text = user_text[:-1]
+
+                elif event.key == pygame.K_RETURN:
+                    mode_.guess = user_text
+                    user_text = ""
+
+                else:
+                    user_text += event.unicode
 
     # Ekran menu głównego
     if mode == "menu":
         # Sprawdzanie kliknięć przycisków menu
         if play.button_clicked():
             mode = "play"
-        if quit.button_clicked():
+        elif quit.button_clicked():
             pygame.quit()
             sys.exit(0)
-        if stats.button_clicked():
+        elif stats.button_clicked():
             mode = "stats"
 
         # Rysowanie przycisków
@@ -88,6 +114,7 @@ while True:
             mode = "menu"
         elif mode1.button_clicked():
             mode = "mode1"
+            active = True
         elif mode2.button_clicked():
             mode = "mode2"
         elif mode3.button_clicked():
@@ -100,10 +127,9 @@ while True:
     elif mode == "mode1":
         if goback.button_clicked():
             mode = "play"
+            mode_.new_game = True
 
-        mode1_txt = font.render("W tym miejscu umieścimy naszą grę, tryb nr 1", True, (200, 200, 255))
-        text_len = mode1_txt.get_width()
-        screen.blit(mode1_txt, (100, 300))
+        mode_.run_mode1()
 
         goback.draw()
 

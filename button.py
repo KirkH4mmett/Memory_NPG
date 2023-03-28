@@ -6,7 +6,6 @@ class Button:
     # Kolory
     button_col = (150, 50, 50)
     hover_col = (100, 40, 40)
-    click_col = (50, 100, 100)
     text_col = (0, 0, 0)
 
     # To się wywołuje tylko raz, przy tworzeniu obiektu
