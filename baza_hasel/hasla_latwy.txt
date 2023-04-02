@@ -66,4 +66,3 @@ wafel
 wyraz
 zegar
 zrobi
-

@@ -46,14 +46,34 @@ goback = Button(screen_width-30, 10, 20, 20, "<-", 20, screen, clicked)
 gamemode_buttons = [goback, mode1, mode2, mode3]
 
 # Wczytanie słów z pliku
-easy_words = ["mama", "tata", "dziadek", "babcia", "syn", "córka", "brat", "siostra"]
-medium_words = []
-hard_words = []
+
+
+def list_clean(lst):
+    for i in range(len(lst)):
+        lst[i] = lst[i].replace('\n', '')
+    return lst
+
+
+easy_words_file = open("baza_hasel/hasla_latwy.txt")
+medium_words_file = open("baza_hasel/hasla_srednie.txt")
+hard_words_file = open("baza_hasel/hasla_trudne.txt")
+
+easy_words = list_clean(easy_words_file.readlines())
+medium_words = list_clean(medium_words_file.readlines())
+hard_words = list_clean(hard_words_file.readlines())
+
+easy_words_file.close()
+medium_words_file.close()
+hard_words_file.close()
+
+#Statystyki gry
+stat = {}
+games_scores = []
 
 new_game = True
 active = False
 user_text = ""
-mode_ = Mode(goback, mode, easy_words, medium_words, hard_words, screen, font)
+mode_ = Mode(goback, mode, easy_words, medium_words, hard_words, screen, font, stat, games_scores)
 
 # Główna pętla gry
 while True:

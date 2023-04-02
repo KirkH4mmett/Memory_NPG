@@ -1,7 +1,7 @@
 import pygame
 import random
 import time
-
+import random
 
 class Mode:
     # Kolory
@@ -9,7 +9,7 @@ class Mode:
     hover_col = (180, 220, 90)
     text_col = (0, 0, 0)
 
-    def __init__(self, goback_button, mode, easy_words, medium_words, hard_words, screen, font):
+    def __init__(self, goback_button, mode, easy_words, medium_words, hard_words, screen, font, stat, games_scores):
         self.goback = goback_button
         self.mode = mode
         self.easy = easy_words
@@ -24,9 +24,13 @@ class Mode:
         self.font = font
         self.score = 0
         self.guess = ""
+        self.stats = stat
+        self.games_scores = games_scores
+        self.game_count = 0
 
     def pick_word(self):
         self.word = random.choice(self.easy)
+        self.stats[self.score] = self.word
 
     def show_word(self):
         word_txt = self.font.render(self.word, True, (200, 200, 200))
@@ -55,11 +59,14 @@ class Mode:
                 self.pick = True
                 self.input = False
                 self.guess = ""
+                self.stats[self.score] = self.word
 
             elif self.guess != "":
                 print("Koniec Gry!!")
                 print("Twój wynik to: ", self.score)
+                self.games_scores[self.game_count] = self.score
                 self.score = 0
+                self.game_count += 1
                 self.input = False
 
         elif self.new_game:
