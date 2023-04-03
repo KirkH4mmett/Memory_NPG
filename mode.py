@@ -26,7 +26,7 @@ class Mode:
         self.guess = ""
         self.stats = stat
         self.games_scores = games_scores
-        self.game_count = 0
+        self.game_count = 1
 
     def pick_word(self):
         self.word = random.choice(self.easy)
@@ -54,7 +54,7 @@ class Mode:
         elif self.input:
             if self.guess == self.word:
                 self.score += 1
-                print("Wynik to: ", self.score)
+                print("Dobrze!")
                 time.sleep(2)
                 self.pick = True
                 self.input = False
@@ -63,9 +63,13 @@ class Mode:
 
             elif self.guess != "":
                 print("Koniec Gry!!")
-                print("Twój wynik to: ", self.score)
-                self.games_scores[self.game_count] = self.score
+                self.games_scores.append(self.score)
+                x = 1
+                for sc in self.games_scores:
+                    print('wynik', x, ':', sc)
+                    x += 1
                 self.score = 0
+                self.guess = ""
                 self.game_count += 1
                 self.input = False
 

@@ -149,7 +149,8 @@ while True:
             mode = "play"
             mode_.new_game = True
 
-        mode_.run_mode1()
+        if mode != "play":
+            mode_.run_mode1()
 
         goback.draw()
 
