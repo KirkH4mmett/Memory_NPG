@@ -6,8 +6,8 @@ from mode import Mode
 
 pygame.init()
 
-screen_width = 900
-screen_height = 600
+screen_width = 1080
+screen_height = 720
 
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Memory słowne")
@@ -15,7 +15,7 @@ pygame.display.set_caption("Memory słowne")
 clock = pygame.time.Clock()
 
 # Kolory
-bg = (90, 90, 90)
+bg = pygame.image.load("background_clear.jpg")
 
 clicked = False
 font = pygame.font.SysFont("Arial", 30)
@@ -45,9 +45,8 @@ goback = Button(screen_width-30, 10, 20, 20, "<-", 20, screen, clicked)
 
 gamemode_buttons = [goback, mode1, mode2, mode3]
 
+
 # Wczytanie słów z pliku
-
-
 def list_clean(lst):
     for i in range(len(lst)):
         lst[i] = lst[i].replace('\n', '')
@@ -67,21 +66,21 @@ medium_words_file.close()
 hard_words_file.close()
 
 #Statystyki gry
-stat = {}
 games_scores = []
 
 new_game = True
 active = False
 user_text = ""
-mode_ = Mode(goback, mode, easy_words, medium_words, hard_words, screen, font, stat, games_scores)
+mode_ = Mode(goback, mode, easy_words, medium_words, hard_words, screen, font, games_scores)
+
+
 
 # Główna pętla gry
 while True:
     # Zmazanie ekranu
-    screen.fill(bg)
-    if active:
-        text_surface = font.render(user_text, True, (255, 255, 255))
-        screen.blit(text_surface, (300, 500))
+    screen.blit(bg, (0, 0))
+    text_surface = font.render(user_text, True, (255, 255, 255))
+    screen.blit(text_surface, (screen_width/2-200, screen_height-103))
 
     # Sprawdzanie wydarzeń
     for event in pygame.event.get():
@@ -122,7 +121,13 @@ while True:
         if goback.button_clicked():
             mode = "menu"
 
-        stats_txt = font.render("N a j l e p s z e   w y n i k i :", True, (159, 43, 104))
+        stats = ""
+        x = 1
+        for sc in games_scores:
+            stats += "Wynik " + str(x) + ": " + str(sc) + "  |  "
+            x += 1
+
+        stats_txt = font.render(stats, True, (255, 255, 255))
         text_len = stats_txt.get_width()
         screen.blit(stats_txt, (100, 100))
 
@@ -143,13 +148,19 @@ while True:
         for button in gamemode_buttons:
             button.draw()
 
+
     # Ekran trybu gry 1
     elif mode == "mode1":
         if goback.button_clicked():
             mode = "play"
+            bg = pygame.image.load("background_clear.jpg")
             mode_.new_game = True
+            mode_.game_over = False
+            mode_.score = 0
+            user_text = ""
 
         if mode != "play":
+            bg = pygame.image.load("background.jpg")
             mode_.run_mode1()
 
         goback.draw()
