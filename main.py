@@ -38,13 +38,22 @@ gm_b_h = 100
 gm_b_cnt = 3
 gm_b_offset = (screen_width - gm_b_cnt * gm_b_w) / (gm_b_cnt+1)
 # Tworzenie przycisków menu wyboru trybu
-mode1 = Button(gm_b_offset, 250, gm_b_w, gm_b_h, "Tryb gry 1", 30, screen, clicked)
-mode2 = Button(2 * gm_b_offset + gm_b_w, 250, gm_b_w, gm_b_h, "Tryb gry 2", 30, screen, clicked)
-mode3 = Button(3 * gm_b_offset + 2 * gm_b_w, 250, gm_b_w, gm_b_h, "Tryb gry 3", 30, screen, clicked)
+mode1 = Button(gm_b_offset, 250, gm_b_w, gm_b_h, "Ilość", 30, screen, clicked)
+mode2 = Button(2 * gm_b_offset + gm_b_w, 250, gm_b_w, gm_b_h, "Losowy", 30, screen, clicked)
+mode3 = Button(3 * gm_b_offset + 2 * gm_b_w, 250, gm_b_w, gm_b_h, "Czas", 30, screen, clicked)
 goback = Button(screen_width-30, 10, 20, 20, "<-", 20, screen, clicked)
 
-gamemode_buttons = [goback, mode1, mode2, mode3]
+easy = Button(50, 50, 80, 30, "Łatwy", 15, screen, clicked)
+medium = Button(150, 50, 80, 30, "Średni", 15, screen, clicked)
+hard = Button(250, 50, 80, 30, "Trudny", 15, screen, clicked)
 
+easy.button_col = (100, 40, 40)
+
+gamemode_buttons = [goback, mode1, mode2, mode3, easy, medium, hard]
+
+timer_event = pygame.USEREVENT + 1
+pygame.time.set_timer(timer_event, 1000)
+start_ticks = pygame.time.get_ticks()
 
 # Wczytanie słów z pliku
 def list_clean(lst):
@@ -88,6 +97,11 @@ while True:
             pygame.quit()
             sys.exit(0)
 
+        elif event.type == timer_event:
+            seconds = (pygame.time.get_ticks() - start_ticks) // 1000
+            time_text = font.render(f"Czas: {seconds}", True, (255, 255, 255))
+            time_rect = time_text.get_rect(topright=(screen_width - 50, 50))
+
         # Wpisywanie
         if event.type == pygame.KEYDOWN:
             if active:
@@ -121,13 +135,11 @@ while True:
         if goback.button_clicked():
             mode = "menu"
 
-        stats = ""
-        x = 1
-        for sc in games_scores:
-            stats += "Wynik " + str(x) + ": " + str(sc) + "  |  "
-            x += 1
+        sts = ""
+        for m, diff, sc in games_scores:
+            sts += diff + " " + m + ": " + str(sc) + " | "
 
-        stats_txt = font.render(stats, True, (255, 255, 255))
+        stats_txt = font.render(sts, True, (255, 255, 255))
         text_len = stats_txt.get_width()
         screen.blit(stats_txt, (100, 100))
 
@@ -142,8 +154,29 @@ while True:
             active = True
         elif mode2.button_clicked():
             mode = "mode2"
+            active = True
         elif mode3.button_clicked():
             mode = "mode3"
+            active = True
+            start_ticks = pygame.time.get_ticks()
+
+        elif easy.button_clicked():
+            easy.button_col = (100, 40, 40)
+            medium.button_col = (150, 50, 50)
+            hard.button_col = (150, 50, 50)
+            mode_.difficulty = "łatwy"
+
+        elif medium.button_clicked():
+            easy.button_col = (150, 50, 50)
+            medium.button_col = (100, 40, 40)
+            hard.button_col = (150, 50, 50)
+            mode_.difficulty = "średni"
+
+        elif hard.button_clicked():
+            easy.button_col = (150, 50, 50)
+            medium.button_col = (150, 50, 50)
+            hard.button_col = (100, 40, 40)
+            mode_.difficulty = "trudny"
 
         for button in gamemode_buttons:
             button.draw()
@@ -158,6 +191,12 @@ while True:
             mode_.game_over = False
             mode_.score = 0
             user_text = ""
+            mode_.words = []
+            mode_.guess = ""
+            mode_.j = 0
+            mode_.i = 0
+            mode_.game_count += 1
+            mode_.input = False
 
         if mode != "play":
             bg = pygame.image.load("background.jpg")
@@ -169,10 +208,21 @@ while True:
     elif mode == "mode2":
         if goback.button_clicked():
             mode = "play"
+            bg = pygame.image.load("background_clear.jpg")
+            mode_.new_game = True
+            mode_.game_over = False
+            mode_.score = 0
+            user_text = ""
+            mode_.words = []
+            mode_.guess = ""
+            mode_.j = 0
+            mode_.i = 0
+            mode_.game_count += 1
+            mode_.input = False
 
-        mode1_txt = font.render("W tym miejscu umieścimy naszą grę, tryb nr 2", True, (200, 200, 255))
-        text_len = mode1_txt.get_width()
-        screen.blit(mode1_txt, (100, 300))
+        if mode != "play":
+            bg = pygame.image.load("background.jpg")
+            mode_.run_mode2()
 
         goback.draw()
 
@@ -180,11 +230,23 @@ while True:
     elif mode == "mode3":
         if goback.button_clicked():
             mode = "play"
+            bg = pygame.image.load("background_clear.jpg")
+            mode_.new_game = True
+            mode_.game_over = False
+            mode_.score = 0
+            user_text = ""
+            mode_.words = []
+            mode_.guess = ""
+            mode_.j = 0
+            mode_.i = 0
+            mode_.game_count += 1
+            mode_.input = False
 
-        mode1_txt = font.render("W tym miejscu umieścimy naszą grę, tryb nr 3", True, (200, 200, 255))
-        text_len = mode1_txt.get_width()
-        screen.blit(mode1_txt, (100, 300))
+        if mode != "play":
+            bg = pygame.image.load("background.jpg")
+            mode_.run_mode3()
 
+        screen.blit(time_text, time_rect)
         goback.draw()
 
     pygame.display.update()
